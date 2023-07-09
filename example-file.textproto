@@ -1,0 +1,19 @@
+# This is a comment
+# hi there
+
+a {
+  b {
+    c {
+      d: 1043E-04
+      reg_scalar: 10
+reg_message { foo: "bar" }
+
+[com.foo.ext.scalar]: 10
+[com.foo.ext.message] { foo: "bar" }
+
+any_value {
+  [type.googleapis.com/com.foo.any] { foo: "bar" }
+}
+    }
+  }
+}
