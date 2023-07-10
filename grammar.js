@@ -1,9 +1,10 @@
+// https://protobuf.dev/reference/protobuf/textformat-spec/
+
 module.exports = grammar({
   name: 'textproto',
 
   rules: {
-    // TODO: add the actual grammar rules
-    source_file: $ => repeat($.field),
+    message: $ => repeat($.field),
 
     field: $ => choice($.message_field, $.scalar_field),
 
@@ -16,9 +17,9 @@ module.exports = grammar({
 
     message_value: $ => choice(
       seq(
-	$.open_bracket,
+	$.open_squiggly,
 	repeat($.field),
-	$.close_bracket,
+	$.close_squiggly,
       ),
       seq(
 	$.open_arrow,
@@ -28,7 +29,7 @@ module.exports = grammar({
     ),
 
     message_list: $ => prec(2, seq(
-      "[", // TODO give name
+      $.open_square,
       optional(
 	seq(
 	  $.message_value,
@@ -40,11 +41,13 @@ module.exports = grammar({
 	  ),
 	),
       ),
-      "]",
+      $.close_square,
     )),
 
-    open_bracket: $ => '{',
-    close_bracket: $ => '}',
+    open_squiggly: $ => '{',
+    close_squiggly: $ => '}',
+    open_square: $ => '[',
+    close_square: $ => ']',
     open_arrow: $ => '<',
     close_arrow: $ => '>',
 
@@ -65,17 +68,17 @@ module.exports = grammar({
     ),
 
     extension_name: $ => seq(
-      "[",
+      $.open_square,
       $.type_name,
-      "]",
+      $.close_square,
     ),
 
     any_name: $ => seq(
-      "[",
+      $.open_square,
       $.domain,
       "/",
       $.type_name,
-      "]",
+      $.close_square,
     ),
 
     type_name: $ => seq(
@@ -88,15 +91,20 @@ module.exports = grammar({
     ),
 
     identifier: $ => /[A-Za-z_][A-Za-z0-9_]*/,
+    signed_identifier: $ => seq(
+      "-",
+      $.identifier,
+    ),
 
     scalar_value: $ => choice(
-      $.string,
+      repeat1($.string),
+      $.identifier,
+      $.signed_identifier,
       $.number,
-      // TODO
     ),
 
     scalar_list: $ => prec(1, seq(
-      "[",
+      $.open_square,
       optional(
 	seq(
 	  $.scalar_value,
@@ -108,7 +116,7 @@ module.exports = grammar({
 	  ),
 	),
       ),
-      "]",
+      $.close_square,
     )),
 
     string: $ => choice(
@@ -137,8 +145,6 @@ module.exports = grammar({
     single_string_contents: $ => /[^\n'\\]+/,
     double_string_contents: $ => /[^\n"\\]+/,
 
-    oct: $ => /[0-7]/,
-    hex: $ => /[0-9A-Fa-f]/,
     string_escape: $ => choice(
       "\\a",
       "\\b",
@@ -158,11 +164,17 @@ module.exports = grammar({
       seq("\\U010", $.hex, $.hex, $.hex, $.hex),
     ),
 
+    oct: $ => /[0-7]/,
+    hex: $ => /[0-9A-Fa-f]/,
+
     number: $ => choice(
+      seq(optional('-'), $.float),
+      seq("-", $.dec_int),    // signed decimal int
+      seq('-', $.oct_int),    // signed octal int
+      seq('-', $.hex_int),    // signed hexidecimal int
       $.dec_int,
       $.oct_int,
       $.hex_int,
-      $.float
     ),
 
     dec_int: $ => choice(
@@ -174,16 +186,14 @@ module.exports = grammar({
     ),
     oct_int: $ => seq(
       "0",
-      $.oct,
-      optional($.oct),
+      repeat1($.oct),
     ),
     hex_int: $ => seq(
       "0",
       choice("X", "x"),
-      $.hex,
-      optional($.hex),
+      repeat1($.hex),
     ),
-    float: $ => choice(
+    float_lit: $ => choice(
       seq(
 	".",
 	/\d+/,
@@ -192,7 +202,7 @@ module.exports = grammar({
       seq(
 	$.dec_int,
 	".",
-	/\d+/,
+	optional(/\d+/),
 	optional($.exp)
       ),
       seq(
@@ -203,6 +213,10 @@ module.exports = grammar({
     exp: $ => seq(
       /[Ee][-+]?/,
       /\d+/,
+    ),
+    float: $ => choice(
+      seq($.float_lit, /[Ff]/),
+      seq($.dec_int, /[Ff]/),
     ),
 
     comment: $ => seq('#', /.*/)
