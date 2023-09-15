@@ -179,27 +179,12 @@
     }
   },
   {
-    "type": "hex_int",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "hex",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "message",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "field",
@@ -271,7 +256,7 @@
           "named": true
         },
         {
-          "type": "field",
+          "type": "message",
           "named": true
         },
         {
@@ -307,21 +292,6 @@
         },
         {
           "type": "oct_int",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "oct_int",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "oct",
           "named": true
         }
       ]
@@ -528,10 +498,6 @@
     "named": false
   },
   {
-    "type": "X",
-    "named": false
-  },
-  {
     "type": "\\",
     "named": false
   },
@@ -612,11 +578,19 @@
     "named": true
   },
   {
+    "type": "hex_int",
+    "named": true
+  },
+  {
     "type": "identifier",
     "named": true
   },
   {
     "type": "oct",
+    "named": true
+  },
+  {
+    "type": "oct_int",
     "named": true
   },
   {
@@ -634,9 +608,5 @@
   {
     "type": "single_string_contents",
     "named": true
-  },
-  {
-    "type": "x",
-    "named": false
   }
 ]

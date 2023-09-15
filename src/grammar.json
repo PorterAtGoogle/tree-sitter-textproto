@@ -2,7 +2,7 @@
   "name": "textproto",
   "rules": {
     "message": {
-      "type": "REPEAT",
+      "type": "REPEAT1",
       "content": {
         "type": "SYMBOL",
         "name": "field"
@@ -76,6 +76,53 @@
         }
       ]
     },
+    "scalar_field": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "field_name"
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "scalar_value"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "scalar_list"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": ";"
+                },
+                {
+                  "type": "STRING",
+                  "value": ","
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
     "message_value": {
       "type": "CHOICE",
       "members": [
@@ -87,11 +134,16 @@
               "name": "open_squiggly"
             },
             {
-              "type": "REPEAT",
-              "content": {
-                "type": "SYMBOL",
-                "name": "field"
-              }
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "message"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
             },
             {
               "type": "SYMBOL",
@@ -107,11 +159,16 @@
               "name": "open_arrow"
             },
             {
-              "type": "REPEAT",
-              "content": {
-                "type": "SYMBOL",
-                "name": "field"
-              }
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "message"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
             },
             {
               "type": "SYMBOL",
@@ -194,53 +251,6 @@
     "close_arrow": {
       "type": "STRING",
       "value": ">"
-    },
-    "scalar_field": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "field_name"
-        },
-        {
-          "type": "STRING",
-          "value": ":"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "scalar_value"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "scalar_list"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ";"
-                },
-                {
-                  "type": "STRING",
-                  "value": ","
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
     },
     "field_name": {
       "type": "CHOICE",
@@ -723,6 +733,18 @@
       "type": "CHOICE",
       "members": [
         {
+          "type": "SYMBOL",
+          "name": "dec_int"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "oct_int"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "hex_int"
+        },
+        {
           "type": "SEQ",
           "members": [
             {
@@ -781,18 +803,6 @@
               "name": "hex_int"
             }
           ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "dec_int"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "oct_int"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "hex_int"
         }
       ]
     },
@@ -804,76 +814,35 @@
           "value": "0"
         },
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[1-9]"
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "\\d+"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            }
-          ]
+          "type": "PATTERN",
+          "value": "[1-9][0-9]*"
         }
       ]
     },
     "oct_int": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "0"
-        },
-        {
-          "type": "REPEAT1",
-          "content": {
-            "type": "SYMBOL",
-            "name": "oct"
-          }
-        }
-      ]
+      "type": "PATTERN",
+      "value": "0[0-7]+"
     },
     "hex_int": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "0"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "X"
-            },
-            {
-              "type": "STRING",
-              "value": "x"
-            }
-          ]
-        },
-        {
-          "type": "REPEAT1",
-          "content": {
-            "type": "SYMBOL",
-            "name": "hex"
-          }
-        }
-      ]
+      "type": "PATTERN",
+      "value": "0[Xx][0-9A-Fa-f]+"
     },
     "float_lit": {
       "type": "CHOICE",
       "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "dec_int"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "exp"
+            }
+          ]
+        },
         {
           "type": "SEQ",
           "members": [
@@ -933,19 +902,6 @@
                   "type": "BLANK"
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "dec_int"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "exp"
             }
           ]
         }

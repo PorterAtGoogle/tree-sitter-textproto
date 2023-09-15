@@ -15,15 +15,27 @@ module.exports = grammar({
       optional(choice(";", ",")),
     ),
 
+    scalar_field: $ => seq(
+      $.field_name,
+      ":",
+      choice(
+	$.scalar_value,
+	$.scalar_list,
+      ),
+      optional(choice(";", ",")),
+    ),
+
+    message: $ => repeat1($.field),
+
     message_value: $ => choice(
       seq(
 	$.open_squiggly,
-	repeat($.field),
+	optional($.message),
 	$.close_squiggly,
       ),
       seq(
 	$.open_arrow,
-	repeat($.field),
+	optional($.message),
 	$.close_arrow,
       )
     ),
@@ -50,16 +62,6 @@ module.exports = grammar({
     close_square: $ => ']',
     open_arrow: $ => '<',
     close_arrow: $ => '>',
-
-    scalar_field: $ => seq(
-      $.field_name,
-      ":",
-      choice(
-	$.scalar_value,
-	$.scalar_list,
-      ),
-      optional(choice(";", ",")),
-    ),
 
     field_name: $ => choice(
       $.extension_name,
@@ -108,12 +110,7 @@ module.exports = grammar({
       optional(
 	seq(
 	  $.scalar_value,
-	  repeat(
-	    seq(
-	      ",",
-	      $.scalar_value,
-	    ),
-	  ),
+	  repeat(seq(",", $.scalar_value)),
 	),
       ),
       $.close_square,
@@ -168,32 +165,26 @@ module.exports = grammar({
     hex: $ => /[0-9A-Fa-f]/,
 
     number: $ => choice(
+      $.dec_int,
+      $.oct_int,
+      $.hex_int,
       seq(optional('-'), $.float),
       seq("-", $.dec_int),    // signed decimal int
       seq('-', $.oct_int),    // signed octal int
       seq('-', $.hex_int),    // signed hexidecimal int
-      $.dec_int,
-      $.oct_int,
-      $.hex_int,
     ),
 
     dec_int: $ => choice(
       "0",
-      seq(
-	/[1-9]/,
-	optional(/\d+/),
-      ),
+      /[1-9][0-9]*/,
     ),
-    oct_int: $ => seq(
-      "0",
-      repeat1($.oct),
-    ),
-    hex_int: $ => seq(
-      "0",
-      choice("X", "x"),
-      repeat1($.hex),
-    ),
+    oct_int: $ => /0[0-7]+/,
+    hex_int: $ => /0[Xx][0-9A-Fa-f]+/,
     float_lit: $ => choice(
+      seq(
+	$.dec_int,
+	$.exp
+      ),
       seq(
 	".",
 	/\d+/,
@@ -205,10 +196,6 @@ module.exports = grammar({
 	optional(/\d+/),
 	optional($.exp)
       ),
-      seq(
-	$.dec_int,
-	$.exp
-      )
     ),
     exp: $ => seq(
       /[Ee][-+]?/,

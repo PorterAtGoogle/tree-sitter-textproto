@@ -5,6 +5,7 @@
 (comment) @comment
 
 (number) @number
+; For stuff like "inf" and "-inf".
 (scalar_value (identifier)) @number
 (scalar_value (signed_identifier)) @number
 
@@ -14,3 +15,4 @@
 (close_square) @punctuation.bracket
 (open_arrow) @punctuation.bracket
 (close_arrow) @punctuation.bracket
+
