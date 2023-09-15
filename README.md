@@ -1,3 +1,3 @@
-Not yet functional. A work in progress.
+# tree-sitter-textproto
 
-Working off of https://protobuf.dev/reference/protobuf/textformat-spec
+https://protobuf.dev/reference/protobuf/textformat-spec
