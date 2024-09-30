@@ -202,7 +202,7 @@ module.exports = grammar({
       /\d+/,
     ),
     float: $ => choice(
-      seq($.float_lit, /[Ff]/),
+      seq($.float_lit, optional(/[Ff]/)),
       seq($.dec_int, /[Ff]/),
     ),
 
