@@ -931,8 +931,16 @@
               "name": "float_lit"
             },
             {
-              "type": "PATTERN",
-              "value": "[Ff]"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[Ff]"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
             }
           ]
         },
